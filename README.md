@@ -23,47 +23,70 @@ A generative SVG design asset tool built under [KJR Labs](https://kjrlabs.in) ·
 
 - **Framework:** Next.js 16 (App Router, fully static)
 - **Styling:** Tailwind CSS
-- **Auth:** Clerk *(wired, keys pending)*
-- **Database:** Convex *(schema ready, deploy key pending)*
+- **Auth:** Clerk *(keys pending)*
+- **Database:** Convex — `https://merry-lobster-483.convex.cloud`
 - **Fonts:** Bricolage Grotesque + DM Sans
 - **Deployment:** Vercel
 
-## Local Development
+## Local Setup
 
 ```bash
+git clone https://github.com/KshitijKoranne/vecctr.git
+cd vecctr
 npm install
+```
+
+Create `.env.local` in the root:
+
+```env
+NEXT_PUBLIC_CONVEX_URL=https://merry-lobster-483.convex.cloud
+CONVEX_DEPLOY_KEY=<your deploy key from Convex dashboard>
+
+# Clerk — add when ready
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_TODO
+CLERK_SECRET_KEY=sk_test_TODO
+```
+
+Push Convex schema (first time only):
+
+```bash
+npx convex dev --once
+```
+
+Run dev server:
+
+```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000)
 
-## Environment Variables
+## Vercel Deployment
 
-Copy `.env.local` and fill in:
-
-```env
-# Clerk — https://dashboard.clerk.com
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
-
-# Convex — https://dashboard.convex.dev
-NEXT_PUBLIC_CONVEX_URL=https://merry-lobster-483.convex.cloud
-CONVEX_DEPLOY_KEY=...
-```
+1. Import repo at vercel.com/new
+2. Add env vars in Vercel dashboard:
+   - `NEXT_PUBLIC_CONVEX_URL`
+   - `CONVEX_DEPLOY_KEY`
+3. Deploy — no other config needed
 
 ## Routes
 
 | Route | Description |
 |-------|-------------|
-| `/` | Landing page |
-| `/generators` | Generator gallery |
-| `/generator/[slug]` | Generator editor |
+| `/` | Landing page with live cycling hero |
+| `/generators` | Generator gallery (All / Free / Pro filter) |
+| `/generator/[slug]` | Full generator editor |
 | `/pricing` | Pricing page |
 
 ## Status
 
-🚧 Active development — Phase 1 complete (landing + gallery + editor)
-
-Next: Auth (Clerk) + Database (Convex) + Payment gateway
+- [x] Landing page
+- [x] Generator gallery
+- [x] Generator editor — all 10 generators working
+- [x] PNG + SVG download, copy SVG
+- [x] Convex schema (palettes + history)
+- [ ] Clerk auth
+- [ ] Free/Pro gating
+- [ ] Payment gateway
 
 Built by [Kshitij Koranne](https://kjrlabs.in)
