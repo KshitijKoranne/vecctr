@@ -1,7 +1,27 @@
+# dependencies
 node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/versions
+
+# next.js
 .next/
+out/
+build/
+
+# env - DO NOT COMMIT
 .env
 .env.local
+.env.production
+
+# misc
 .DS_Store
 *.log
-dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# convex (generated, not committed)
+convex/_generated/
