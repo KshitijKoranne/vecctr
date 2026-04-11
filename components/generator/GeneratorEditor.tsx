@@ -484,15 +484,21 @@ function ColorRow({ label, value, onChange }: { label: string; value: string; on
     if (clean.length === 6) onChange("#" + clean);
   };
 
+  const openPicker = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    pickerRef.current?.click();
+  };
+
   return (
     <div className="flex items-center gap-2.5 mb-2.5 last:mb-0">
       <span className="text-[11px] font-medium text-text-2 w-[72px] flex-shrink-0">{label}</span>
       <div
         className="flex flex-1 items-center gap-2 bg-surface2 border border-border
                    rounded-sm px-2.5 py-[5px] hover:border-border2 transition-colors
-                   cursor-pointer"
-        onClick={() => pickerRef.current?.click()}
+                   cursor-pointer relative"
+        onClick={openPicker}
       >
+        {/* Color swatch */}
         <div
           className="w-[18px] h-[18px] rounded flex-shrink-0 border border-white/10"
           style={{ background: value }}
@@ -507,20 +513,32 @@ function ColorRow({ label, value, onChange }: { label: string; value: string; on
                      outline-none uppercase tracking-wider w-0 min-w-0"
           spellCheck={false}
         />
-        {/* hidden native picker */}
+        <button
+          onClick={openPicker}
+          className="text-text-3 hover:text-text-2 transition-colors ml-auto flex-shrink-0"
+        >
+          <EyeIcon />
+        </button>
+        {/* Native color picker — positioned but invisible, must have real dimensions */}
         <input
           ref={pickerRef}
           type="color"
           value={value}
           onChange={e => onChange(e.target.value)}
-          className="w-0 h-0 opacity-0 absolute"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "1px",
+            height: "1px",
+            opacity: 0,
+            border: "none",
+            padding: 0,
+            cursor: "pointer",
+            pointerEvents: "none",
+          }}
+          tabIndex={-1}
         />
-        <button
-          onClick={e => { e.stopPropagation(); pickerRef.current?.click(); }}
-          className="text-text-3 hover:text-text-2 transition-colors ml-auto flex-shrink-0"
-        >
-          <EyeIcon />
-        </button>
       </div>
     </div>
   );
