@@ -4,16 +4,12 @@ import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  axes: ["opsz"],
-  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-heading",
   display: "swap",
 });
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
-  axes: ["opsz"],
-  weight: ["300", "400", "500"],
   variable: "--font-body",
   display: "swap",
 });
