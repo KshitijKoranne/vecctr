@@ -7,12 +7,33 @@
   --font-body:    'DM Sans', sans-serif;
 }
 
+/* ── Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Remove blue outlines — use custom focus ring only where needed */
+*:focus {
+  outline: none;
+}
+*:focus-visible {
+  outline: 2px solid rgba(245, 166, 35, 0.5);
+  outline-offset: 2px;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
 html { scroll-behavior: smooth; }
 body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   background: #0C0C0E;
   color: #EFEFEF;
+  margin: 0;
+  padding: 0;
 }
 
 .font-heading { font-family: var(--font-heading); }
@@ -47,3 +68,4 @@ input[type="range"]::-webkit-slider-thumb:hover {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
