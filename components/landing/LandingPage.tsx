@@ -6,38 +6,42 @@ import { useRouter } from "next/navigation";
 import { GENERATORS } from "@/lib/generatorMeta";
 import { DEFAULT_PARAMS, renderGenerator } from "@/lib/generators";
 
+// ── Pre-generated hero SVGs — no runtime cost ──────────────────────────────
+const HERO_SVGS = [
+  "/hero/hero-1.svg",
+  "/hero/hero-2.svg",
+  "/hero/hero-3.svg",
+  "/hero/hero-4.svg",
+  "/hero/hero-5.svg",
+  "/hero/hero-6.svg",
+  "/hero/hero-7.svg",
+  "/hero/hero-8.svg",
+];
+
 const THUMB_SEEDS = [10777, 21333, 31999, 42555, 53111, 63777, 74333, 84999, 95555, 10611];
 const HERO_SEEDS  = [28471, 59302, 13847, 73621, 42190, 88453, 31075, 64829, 17634, 50291];
 
 function cn(...c: (string | false | undefined | null)[]) { return c.filter(Boolean).join(" "); }
 
 export function LandingPage() {
-  const [heroSvg, setHeroSvg]           = useState("");
-  const [heroGenIdx, setHeroGenIdx]     = useState(0);
-  const [heroFade, setHeroFade]         = useState(true);
-  const [scrolled, setScrolled]         = useState(false);
-  const heroTimerRef                    = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [heroIdx, setHeroIdx]   = useState(0);
+  const [heroFade, setHeroFade] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
+  const timerRef                = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // hero cycling
+  // Hero cycling — just swap the img src, no SVG generation
   useEffect(() => {
-    const W = typeof window !== "undefined" ? window.innerWidth : 1440;
-    const H = typeof window !== "undefined" ? window.innerHeight : 900;
-    const gen = GENERATORS[heroGenIdx];
-    setHeroSvg(renderGenerator(gen.slug, W, H, HERO_SEEDS[heroGenIdx], DEFAULT_PARAMS[gen.slug], "bottom"));
-  }, [heroGenIdx]);
-
-  useEffect(() => {
-    heroTimerRef.current = setTimeout(() => {
+    timerRef.current = setTimeout(() => {
       setHeroFade(false);
       setTimeout(() => {
-        setHeroGenIdx(i => (i + 1) % GENERATORS.length);
+        setHeroIdx(i => (i + 1) % HERO_SVGS.length);
         setHeroFade(true);
       }, 600);
     }, 5000);
-    return () => clearTimeout(heroTimerRef.current);
-  }, [heroGenIdx]);
+    return () => clearTimeout(timerRef.current);
+  }, [heroIdx]);
 
-  // nav scroll
+  // Nav scroll
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handler);
@@ -78,18 +82,24 @@ export function LandingPage() {
       {/* ── HERO ── */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
 
-        {/* live background */}
-        <div
-          className="absolute inset-0 transition-opacity duration-[600ms]"
-          style={{ opacity: heroFade ? 1 : 0 }}
-          dangerouslySetInnerHTML={{ __html: heroSvg }}
+        {/* Pre-generated SVG background — img tag, zero JS generation cost */}
+        <img
+          key={heroIdx}
+          src={HERO_SVGS[heroIdx]}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            opacity: heroFade ? 1 : 0,
+            transition: "opacity 600ms ease-in-out",
+          }}
         />
 
-        {/* gradient overlay */}
+        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b
           from-bg/40 via-bg/20 to-bg pointer-events-none" />
 
-        {/* content */}
+        {/* Content */}
         <div className="relative z-10 text-center px-6 max-w-[820px] mx-auto
                         animate-[fadeUp_1s_cubic-bezier(0.16,1,0.3,1)_both]">
           <div className="inline-flex items-center gap-2 bg-accent/10 border border-accent/20
@@ -135,7 +145,7 @@ export function LandingPage() {
           </p>
         </div>
 
-        {/* scroll indicator */}
+        {/* Scroll indicator */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col
                         items-center gap-2 text-text-3 text-[10px] tracking-[2px] uppercase">
           <div className="w-px h-10 bg-gradient-to-b from-accent/60 to-transparent
@@ -240,8 +250,6 @@ export function LandingPage() {
               ))}
             </div>
           </div>
-
-          {/* app mockup */}
           <AppMockup />
         </div>
       </section>
@@ -292,8 +300,6 @@ export function LandingPage() {
             <p className="text-[17px] text-text-2 font-light">Start free. Upgrade when you need more.</p>
           </div>
           <div className="grid grid-cols-2 gap-5">
-
-            {/* Free */}
             <div className="bg-bg border border-border rounded-xl p-8">
               <p className="text-[11px] font-bold tracking-[1.5px] uppercase text-text-2 mb-5">Free</p>
               <div className="font-heading font-extrabold text-[48px] tracking-[-3px] text-text leading-none mb-1">₹0</div>
@@ -319,8 +325,6 @@ export function LandingPage() {
                 Start for free
               </Link>
             </div>
-
-            {/* Pro */}
             <div className="bg-bg border border-accent/30 rounded-xl p-8 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent pointer-events-none" />
@@ -395,9 +399,7 @@ export function LandingPage() {
   );
 }
 
-// ─────────────────────────────────────────────
-// SURPRISE ME BUTTON
-// ─────────────────────────────────────────────
+// ── SURPRISE ME BUTTON ────────────────────────────────────────────────────────
 function SurpriseMeButton() {
   const router = useRouter();
   const [spinning, setSpinning] = useState(false);
@@ -419,14 +421,12 @@ function SurpriseMeButton() {
   );
 }
 
-// ─────────────────────────────────────────────
-// APP MOCKUP
-// ─────────────────────────────────────────────
+// ── APP MOCKUP ────────────────────────────────────────────────────────────────
 function AppMockup() {
   const [idx, setIdx] = useState(0);
   const svgPreview = renderGenerator(
     GENERATORS[idx % GENERATORS.length].slug, 340, 180,
-    HERO_SEEDS[idx % GENERATORS.length],
+    HERO_SEEDS[idx % HERO_SEEDS.length],
     DEFAULT_PARAMS[GENERATORS[idx % GENERATORS.length].slug],
     "bottom"
   );
@@ -440,23 +440,18 @@ function AppMockup() {
     <div className="bg-surface2 border border-border rounded-xl overflow-hidden aspect-[4/3]
                     flex items-center justify-center">
       <div className="w-[90%] bg-bg rounded-xl border border-border overflow-hidden shadow-2xl">
-        {/* title bar */}
         <div className="h-8 bg-surface flex items-center px-3 gap-1.5 border-b border-border">
           <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F57]" />
           <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
           <div className="w-2.5 h-2.5 rounded-full bg-[#28C840]" />
         </div>
-        {/* editor */}
         <div className="flex h-[180px]">
-          {/* canvas preview */}
           <div className="flex-1 overflow-hidden transition-opacity duration-500"
             dangerouslySetInnerHTML={{ __html: svgPreview }} />
-          {/* sidebar mockup */}
           <div className="w-[88px] border-l border-border p-2.5 flex flex-col gap-1.5">
             {[80,45,90,55,70,40,65,85].map((w,i) => (
               <div key={i}
-                className={cn("h-1.5 rounded-full",
-                  i % 3 === 1 ? "bg-accent/30" : "bg-border")}
+                className={cn("h-1.5 rounded-full", i % 3 === 1 ? "bg-accent/30" : "bg-border")}
                 style={{ width:`${w}%` }}
               />
             ))}
